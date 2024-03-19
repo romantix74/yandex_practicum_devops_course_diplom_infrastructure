@@ -4,9 +4,17 @@
 
 ## Getting started
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+git clone git@gitlab.praktikum-services.ru:std-022-024/infrastructure.git
+git submodule init
+git submodule update
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+
+Перед началом работы с terraform получаем токен:
+```
+    export YC_TOKEN=$(yc iam create-token)
+    export TF_VAR_cloud_id=$(yc config get cloud-id)
+    export TF_VAR_folder_id=$(yc config get folder-id)
+```
 
 ## Add your files
 
