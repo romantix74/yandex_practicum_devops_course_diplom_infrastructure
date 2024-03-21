@@ -1,60 +1,90 @@
-module "kube" {
-  source     = "github.com/terraform-yc-modules/terraform-yc-kubernetes"
-  network_id = "enp7p03l1cc21o48mvs4"
+resource "yandex_kubernetes_cluster" "k8s_zonal_cluster" {
+ network_id = yandex_vpc_network.k8s-network.id
+ master {
+   version = var.k8s_version
+   zonal {
+     zone      = yandex_vpc_subnet.k8s-subnet.zone
+     subnet_id = yandex_vpc_subnet.k8s-subnet.id
+   }
+   public_ip = true
+ }
+ service_account_id      = yandex_iam_service_account.kubernetes.id
+ node_service_account_id = yandex_iam_service_account.kubernetes.id
+   depends_on = [
+     yandex_resourcemanager_folder_iam_binding.editor,
+     yandex_resourcemanager_folder_iam_binding.images-puller
+   ]
+}
 
-  master_locations   = [
-    {
-      zone      = "ru-central1-a"
-      subnet_id = "e9bndk5h1io4rvpsieju"
-    },
-    {
-      zone      = "ru-central1-b" 
-      subnet_id = "e2ltfqv26ioehhd6thkl"
-    },
-    {
-      zone      = "ru-central1-d" 
-      subnet_id = "fl8asj5k87t7b2q71u25"
+resource "yandex_vpc_network" "k8s-network" { 
+  name = "k8s-network" 
+}
+
+resource "yandex_vpc_subnet" "k8s-subnet" {
+ name = "k8s-subnet"
+ v4_cidr_blocks = [var.v4_cidr_blocks]
+ zone           = var.zone
+ network_id     = yandex_vpc_network.k8s-network.id
+}
+
+resource "yandex_iam_service_account" "kubernetes" {
+ name        = "kubernetes"
+ description = "Service account for manage kubernetes"
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "editor" {
+ # Сервисному аккаунту назначается роль "editor".
+ folder_id = var.folder_id
+ role      = "editor"
+ members   = [
+   "serviceAccount:${yandex_iam_service_account.kubernetes.id}"
+ ]
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "images-puller" {
+ # Сервисному аккаунту назначается роль "container-registry.images.puller".
+ folder_id = var.folder_id
+ role      = "container-registry.images.puller"
+ members   = [
+   "serviceAccount:${yandex_iam_service_account.kubernetes.id}"
+ ]
+}
+
+resource "yandex_kubernetes_node_group" "k8s-node-group" {
+  cluster_id  = "${yandex_kubernetes_cluster.k8s_zonal_cluster.id}"
+  name        = "k8s-node-group"
+  version     = var.k8s_version
+
+  instance_template {
+    platform_id = var.platform_id
+
+    network_interface {
+      nat                = true
+      subnet_ids         = ["${yandex_vpc_subnet.k8s-subnet.id}"]
     }
-  ]
 
-  master_maintenance_windows = [
-    {
-      day        = "monday"
-      start_time = "23:00"
-      duration   = "3h"
+    resources {
+      memory = var.node_memory
+      cores  = var.node_cores
+      core_fraction = var.node_core_fraction
     }
-  ]
 
-  node_groups = {
-    "yc-k8s-ng-01" = {
-      description  = "Kubernetes nodes group 01"
-      fixed_scale   = {
-        size = 3
-      }
-      node_labels   = {
-        role        = "worker-01"
-        environment = "testing"
-      }
-    },
-    "yc-k8s-ng-02"  = {
-      description   = "Kubernetes nodes group 02"
-      auto_scale    = {
-        min         = 2
-        max         = 4
-        initial     = 2
-      }
-      # node_locations   = [
-      #   {
-      #     zone      = "ru-central1-b"
-      #     subnet_id = "e2ltfqv26ioehhd6thkl"
-      #   }
-      # ]
-      node_labels   = {
-        role        = "worker-02"
-        environment = "dev"
-      }
-      max_expansion   = 1
-      max_unavailable = 1
+    boot_disk {
+      type = var.boot_disk_type
+      size = var.boot_disk_size
     }
   }
+
+  scale_policy {
+    fixed_scale {
+      size = var.nodes_count
+    }
+  }
+
+  allocation_policy {
+    location {
+      zone = var.zone
+    }
+  }
+
 }
