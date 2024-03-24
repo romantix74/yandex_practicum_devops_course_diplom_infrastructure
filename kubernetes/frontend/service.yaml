@@ -13,3 +13,4 @@ spec:
   # указываем, с каким Pod'ом хотим работать.
   selector:
     app: frontend
+  type: LoadBalancer

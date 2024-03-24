@@ -27,7 +27,7 @@ spec:
               - key: app
                 operator: In
                 values:
-                - frontend
+                  - frontend
       containers:
         - name: frontend
           image: gitlab.praktikum-services.ru:5050/std-022-024/momo-store/momo-frontend:latest
@@ -37,7 +37,7 @@ spec:
               value: backend
           ports:
             - name: frontend
-              containerPort: 8080
+              containerPort: 80
           # livenessProbe:
           #   httpGet:
           #     path: /
