@@ -1,0 +1,28 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    #spec.ingressClassName: "nginx"      
+    # cert-manager.io/cluster-issuer: "yc-clusterissuer"
+    # acme.cert-manager.io/http01-edit-in-place: "true"
+    # cert-manager.io/cluster-issuer: "letsencrypt"
+spec:
+  tls:
+    - hosts:
+      - "momo-store-std-022-024.ru"
+      secretName: momo-tls #yc-certmgr-cert-id-fpq6205n04mllkbr47hj #momo-tls
+  rules:
+    - host: "momo-store-std-022-024.ru"
+      http:
+        paths:
+        - path: "/"
+          pathType: Prefix
+          backend:
+            service:
+              name: frontend-service
+              port:
+                number: 80
