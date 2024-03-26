@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  revisionHistoryLimit: 15
+  replicas: 1 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2
+      maxSurge: 20%
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: gitlab.praktikum-services.ru:5050/std-022-024/momo-store/momo-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - name: backend
+              containerPort: 8081
+      imagePullSecrets:
+        - name: docker-config-secret

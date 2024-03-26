@@ -1,3 +1,0 @@
-[submodule "modules/terraform-yc-kubernetes"]
-	path = modules/terraform-yc-kubernetes
-	url = https://github.com/terraform-yc-modules/terraform-yc-kubernetes

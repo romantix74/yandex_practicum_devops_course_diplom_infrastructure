@@ -1,6 +1,7 @@
 variable "cloud_id" {
   type        = string
   description = "cloud ID"
+
   sensitive = true
   nullable  = false
 }
@@ -18,29 +19,17 @@ variable "network_id" {
   default     = "enp7p03l1cc21o48mvs4"
 }
 
-variable "subnet_id_ru-central1-a" {
-  type        = string
-  description = "default-ru-central1-a"
-  default     = "e9bndk5h1io4rvpsieju"
-}
 
-variable "subnet_id_ru-central1-b" {
-  type        = string
-  description = "default-ru-central1-b"
-  default     = "e2ltfqv26ioehhd6thkl"
-}
-
-variable "subnet_id_ru-central1-d" {
-  type        = string
-  description = "default-ru-central1-d"
-  default     = "fl8asj5k87t7b2q71u25"
-}
-
-
-
-variable "zone" {
+variable "cluster_zone" {
   type        = string
   default     = "ru-central1-a"
+  description = "Cluster availability zone"
+  validation {
+    condition     = contains(toset(["ru-central1-a", "ru-central1-b", "ru-central1-c"]), var.cluster_zone)
+    error_message = "Select availability zone from the list: ru-central1-a, ru-central1-b, ru-central1-c."
+  }
+  sensitive = true
+  nullable = false
 }
 
 variable "v4_cidr_blocks" {
