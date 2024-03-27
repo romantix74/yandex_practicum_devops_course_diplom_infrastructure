@@ -32,6 +32,7 @@ variable "cluster_zone" {
   nullable = false
 }
 
+
 variable "v4_cidr_blocks" {
   type        = string
   default     = "192.168.0.0/16"
@@ -69,7 +70,7 @@ variable "boot_disk_size" {
 
 variable "nodes_count" {
   type        = number
-  default     = 2
+  default     = 3
 }
 
 variable "k8s_version" {
