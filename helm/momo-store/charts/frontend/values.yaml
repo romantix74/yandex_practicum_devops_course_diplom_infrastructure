@@ -1,0 +1,16 @@
+image:
+  repository: gitlab.praktikum-services.ru:5050/std-022-024/momo-store/momo-frontend
+  pullPolicy: Always
+  tag: {{TAG}}
+replicas: 2
+revisionHistoryLimit: 15
+strategy:
+  type: RollingUpdate
+service:
+  port: 80
+fqdn: momo-store-std-022-024.ru
+imagePullSecrets:
+  name: docker-config
+  key: .dockerconfigjson
+  value: "ewogICAgImF1dGhzIjogewogICAgICAgICJnaXRsYWIucHJha3Rpa3VtLXNlcnZpY2VzLnJ1OjUwNTAiOnsKICAgICAgICAgICAgInVzZXJuYW1lIjoia3ViX3lkdWFldiIsCiAgICAgICAgICAgICJwYXNzd29yZCI6IlVlcktENlg4blVIYnl3Z1R2ZnYzIiAgICAgICAgICAgCiAgICAgICAgfQogICAgfQp9Cg=="
+  type: kubernetes.io/dockerconfigjson

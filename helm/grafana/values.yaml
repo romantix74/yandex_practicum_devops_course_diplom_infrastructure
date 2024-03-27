@@ -1,0 +1,4 @@
+fqdn: grafana.momo-store-std-022-024.ru 
+port: 3000
+
+persistentVolumeName: nginx-pv
